@@ -2,7 +2,7 @@
   "development": {
     "username": "root",
     "password": "asdf1234",
-    "database": "lv2_project",
+    "database": "lv4_project",
     "host": "express-database.cxol0y7vyzbw.us-east-1.rds.amazonaws.com",
     "dialect": "mysql"
   },
