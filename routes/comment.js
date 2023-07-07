@@ -39,7 +39,7 @@ router.post("/posts/:postId/comments", authMiddleware, async (req, res) => {
   });
 
   // 5. 댓글 내용을 비워둔 채 댓글 작성 API를 호출하면 "댓글 내용을 입력해주세요" 라는 메세지를 return하기
-  if (content.length <= 0) {
+  if (content.length === 0) {
     return res.status(404).json({ message: "댓글 내용을 입력해주세요." });
   }
   if (findUser.length <= 0) {
@@ -61,68 +61,76 @@ router.post("/posts/:postId/comments", authMiddleware, async (req, res) => {
 
 // 댓글 수정 API
 // 7. 로그인 토큰을 검사하여, 해당 사용자가 작성한 댓글만 수정 가능
-router.put("/posts/:postId/comments/:commentId", authMiddleware, async (req, res) => {
-  const { userId } = res.locals.user;
-  const { postId, commentId } = req.params;
-  const { content } = req.body;
+router.put(
+  "/posts/:postId/comments/:commentId",
+  authMiddleware,
+  async (req, res) => {
+    const { userId } = res.locals.user;
+    const { postId, commentId } = req.params;
+    const { content } = req.body;
 
-  const CommentId = await Comments.findOne({
-    where: { commentId },
-  });
-
-  if (CommentId.UserId !== userId) {
-    return res.status(404).json({
-      message: "사용자가 일치하지 않습니다.",
+    const CommentId = await Comments.findOne({
+      where: { commentId },
     });
-  }
-  // 8. 댓글 내용을 비워둔 채 댓글 수정 API를 호출하면 "댓글 내용을 입력해주세요" 라는 메세지를 return하기
-  if (content.length === 0) {
-    return res.status(403).json({
-      message: "댓글 내용을 입력해주세요.",
-    });
-  }
 
-  // 9. 댓글 내용을 입력하고 댓글 수정 API를 호출한 경우 작성한 댓글을 수정하기
-  await Comments.update(
-    { content },
-    {
-      where: {
-        [Op.and]: [{ postId }, { commentId }],
-      },
+    if (CommentId.UserId !== userId) {
+      return res.status(404).json({
+        message: "사용자가 일치하지 않습니다.",
+      });
     }
-  );
+    // 8. 댓글 내용을 비워둔 채 댓글 수정 API를 호출하면 "댓글 내용을 입력해주세요" 라는 메세지를 return하기
+    if (content.length === 0) {
+      return res.status(403).json({
+        message: "댓글 내용을 입력해주세요.",
+      });
+    }
 
-  return res.status(200).json({ message: "게시글이 수정되었습니다." });
-});
+    // 9. 댓글 내용을 입력하고 댓글 수정 API를 호출한 경우 작성한 댓글을 수정하기
+    await Comments.update(
+      { content },
+      {
+        where: {
+          [Op.and]: [{ postId }, { commentId }],
+        },
+      }
+    );
+
+    return res.status(200).json({ message: "게시글이 수정되었습니다." });
+  }
+);
 
 // 댓글 삭제 API
 // 10. 로그인 토큰을 검사하여, 해당 사용자가 작성한 댓글만 삭제 가능
-router.delete("/posts/:postId/comments/:commentId", authMiddleware, async (req, res) => {
-  const { userId } = res.locals.user;
-  const { commentId } = req.params;
+router.delete(
+  "/posts/:postId/comments/:commentId",
+  authMiddleware,
+  async (req, res) => {
+    const { userId } = res.locals.user;
+    const { commentId } = req.params;
 
-  const CommentId = await Comments.findOne({
-    where: { commentId },
-  });
+    const CommentId = await Comments.findOne({
+      where: { commentId },
+    });
 
-  if (!CommentId) {
-    return res.status(404).json({
-      message: "게시글이 존재하지 않습니다.",
+    if (!CommentId) {
+      return res.status(404).json({
+        message: "게시글이 존재하지 않습니다.",
+      });
+    } else if (CommentId.UserId !== userId) {
+      return res.status(403).json({
+        message: "게시글 삭제 권한이 있는 사용자가 아닙니다.",
+      });
+    }
+
+    // 11. 원하는 댓글을 삭제하기
+    await Comments.destroy({
+      where: {
+        [Op.and]: [{ userId }, { commentId }],
+      },
     });
-  } else if (CommentId.UserId !== userId) {
-    return res.status(403).json({
-      message: "게시글 삭제 권한이 있는 사용자가 아닙니다.",
-    });
+
+    return res.status(200).json({ message: "게시글이 삭제되었습니다." });
   }
-
-  // 11. 원하는 댓글을 삭제하기
-  await Comments.destroy({
-    where: {
-      [Op.and]: [{ userId }, { commentId }],
-    },
-  });
-
-  return res.status(200).json({ message: "게시글이 삭제되었습니다." });
-});
+);
 
 module.exports = router;
