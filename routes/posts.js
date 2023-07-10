@@ -3,6 +3,7 @@ const router = express.Router();
 const authMiddleware = require("../middlewares/auth-middleware");
 const { Posts } = require("../models");
 const { Op } = require('sequelize');
+const { Likes } = require("../models");
 
 
 

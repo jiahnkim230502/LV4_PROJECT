@@ -93,7 +93,7 @@ router.get("/like", authMiddleware, async (req, res) => {
           required: true,
         },
       ],
-      // Posts테이블의 postId컬럼을 기준으로 그룹화 => 공통적으로 postId값이 들어간 결과값을 그룹으로 묶음.
+      // Posts테이블의 postId컬럼을 기준으로 그룹화 (공통적으로 postId값이 들어간 결과값을 그룹으로 묶음.)
       group: ["Posts.postId"],
       // 그룹의 정렬은 Likes 테이블의 UserId를 기준으로 내림차순으로 설정.
       order: [[sequelize.fn("COUNT", sequelize.col("Likes.UserId")), "DESC"]],
