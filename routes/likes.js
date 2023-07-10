@@ -60,7 +60,7 @@ router.get("/like", authMiddleware, async (req, res) => {
   try {
     const { userId } = res.locals.user;
     // Likes 컬럼에서 전달받은 userId 값과 일치하는 userId 컬럼에 해당하는 속성값 postId를 myLikedPosts에 할당.
-    // userId가 like 한 모든 postId를 반환.
+    // userId가 like 한 모든 postId를 myLikedPosts에 할당.
     const myLikedPosts = await Likes.findAll({
       attributes: ["PostId"],
       where: { UserId: userId },
@@ -86,7 +86,7 @@ router.get("/like", authMiddleware, async (req, res) => {
       include: [
         {
           model: Users,
-          attributes: ["userId", "nickname"],
+          attributes: ["userId"],
         },
         {
           model: Likes,
@@ -96,6 +96,7 @@ router.get("/like", authMiddleware, async (req, res) => {
       ],
       // Posts테이블의 postId컬럼을 기준으로 그룹화 (공통적으로 postId값이 들어간 결과값을 그룹으로 묶음.)
       group: ["Posts.postId"],
+      // 15. 제일 좋아요가 많은 게시글을 맨 위에 정렬하기 (내림차순)
       // 그룹의 정렬은 Likes 테이블의 UserId를 기준으로 내림차순으로 설정.
       order: [[sequelize.fn("COUNT", sequelize.col("Likes.UserId")), "DESC"]],
       // 객체형식을 순수한 데이터로 반환.

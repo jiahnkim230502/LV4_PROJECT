@@ -24,8 +24,8 @@ router.post("/posts", authMiddleware, async (req, res) => {
 // 게시글 목록 조회 API
 router.get("/posts", async (req, res) => {
   // 7-2. 제목, 작성자명(nickname), 작성 날짜를 조회하기
-  // LV4 과제 --------------------------------------------
-  // 15. 제목, 작성자명(nickname), 작성 날짜, 좋아요 갯수를 조회하기
+  // ---------------------------LV4 과제 --------------------------
+  // 16. 제목, 작성자명(nickname), 작성 날짜, 좋아요 갯수를 조회하기
   const posts = await Posts.findAll({
     attributes: [
       "postId",
@@ -43,7 +43,7 @@ router.get("/posts", async (req, res) => {
       },
     ],
     group: ["Posts.postId"],
-    // 8. 작성 날짜 기준으로 내림차순 정렬하기
+    // 17. 작성 날짜 기준으로 내림차순 정렬하기
     order: [["createdAt", "DESC"]],
     raw: true,
   });
@@ -55,6 +55,7 @@ router.get("/posts", async (req, res) => {
 // 11. 제목, 작성자명(nickname), 작성 날짜, 작성 내용을 조회하기
 router.get("/posts/:postId", async (req, res) => {
   const { postId } = req.params;
+  // 18. 제목, 작성자명(nickname), 작성 날짜, 작성 내용, 좋아요 갯수를 조회하기 
   const post = await Posts.findOne({
     attributes: [
       "title",

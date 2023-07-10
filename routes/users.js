@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const { Users, UserInfos } = require("../models");
+require("dotenv").config();
 
 // 회원가입 API
 router.post("/signup", async (req, res) => {
@@ -80,7 +81,7 @@ router.post("/login", async (req, res) => {
   }
 
   // jwt를 생성하고
-  const token = jwt.sign({userId: user.userId}, "customized_secret_key");
+  const token = jwt.sign({userId: user.userId}, process.env.SECRET);
 
   // 쿠키를 발급
   // 6. 로그인 성공 시, 로그인에 성공한 유저의 정보를 JWT를 활용하여 클라이언트에게 Cookie로 전달하기
