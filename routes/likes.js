@@ -65,7 +65,6 @@ router.get("/like", authMiddleware, async (req, res) => {
       where: { UserId: userId },
     });
     const myLikedPostIds = await myLikedPosts.map(post => post.PostId);
-
     const posts = await Posts.findAll({
       attributes: [
         "postId",
@@ -77,7 +76,7 @@ router.get("/like", authMiddleware, async (req, res) => {
         // sequelize.fn()는 Sequelize에서 제공하는 함수를 사용하기 위한 함수를 사용하기 위한 메소드.
         // sequelize.col()은 Sequelize에서 제공하는 열을 나타내는 메서드.
         [sequelize.fn("COUNT", sequelize.col("Likes.UserId")), "likes"],
-        // 'COUNT'는 COUNT함수를 쓰기 위한 표현법이며 Likes테이블을 참조하여 UserId 컬럼에 접근하고 그 컬럼의 갯수에 'likes'라는 별칭을 부여.
+        // 'COUNT'는 COUNT함수를 쓰기 위한 표현법이며 Likes테이블을 참조하여 UserId 컬럼에 접근하고 그 컬럼의 갯수에 따라 'likes'라는 별칭을 부여.
       ],
       // Users, Likes 모델에 관계를 갖고 각각에 속성값을 지정하여 데이터를 가져온다.
       // 속성값을 지정했다면 선택적으로 결과를 볼 수 있다. 여기서 Likes모델의 attributes는 모든 속성값을 가져오도록 빈 배열로 설정하였음.
@@ -106,7 +105,6 @@ router.get("/like", authMiddleware, async (req, res) => {
         },
       },
     }).then((models) => models.map(parseModelToFlatObject));
-
     return res.status(200).json({ data: posts });
   } catch (error) {
     console.error(error.message);
