@@ -40,6 +40,7 @@ router.put("/posts/:postId/like", authMiddleware, async (req, res) => {
       .status(404)
       .json({ errorMessage: "게시글이 존재하지 않습니다." });
   }
+  // 13. 로그인 토큰에 해당하는 사용자가 좋아요 한 글에 한해서, 좋아요 취소 할 수 있게 하기
   // existLike에 PostId와 UserId 자료가 존재하지 않는다면 Likes 데이터베이스에 PostId와 UserId를 생성한다.
   if (!existLike) {
     await Likes.create({ PostId: postId, UserId: userId });
@@ -65,6 +66,7 @@ router.get("/like", authMiddleware, async (req, res) => {
       where: { UserId: userId },
     });
     const myLikedPostIds = await myLikedPosts.map(post => post.PostId);
+    // 14. 게시글 목록 조회시 글의 좋아요 갯수도 같이 표출하기
     const posts = await Posts.findAll({
       attributes: [
         "postId",

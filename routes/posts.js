@@ -24,6 +24,8 @@ router.post("/posts", authMiddleware, async (req, res) => {
 // 게시글 목록 조회 API
 router.get("/posts", async (req, res) => {
   // 7-2. 제목, 작성자명(nickname), 작성 날짜를 조회하기
+  // LV4 과제 --------------------------------------------
+  // 15. 제목, 작성자명(nickname), 작성 날짜, 좋아요 갯수를 조회하기
   const posts = await Posts.findAll({
     attributes: [
       "postId",
@@ -54,7 +56,20 @@ router.get("/posts", async (req, res) => {
 router.get("/posts/:postId", async (req, res) => {
   const { postId } = req.params;
   const post = await Posts.findOne({
-    attributes: ["title", "content", "nickname", "createdAt"],
+    attributes: [
+      "title",
+      "content",
+      "nickname",
+      "createdAt",
+      [sequelize.fn("COUNT", sequelize.col("Likes.UserId")), "likes"],
+    ],
+    include: [
+      {
+        model: Likes,
+        attributes: [],
+        require: true,
+      },
+    ],
     where: { postId },
   });
 
